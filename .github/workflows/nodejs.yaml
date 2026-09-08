@@ -45,31 +45,31 @@ jobs:
         state: ${{ steps.unit_tests.outcome }}
         description: ${{ steps.unit_tests.outcome }}
 
-    # - name: SonarQube Scan
-    #   uses: SonarSource/sonarqube-scan-action@v6
-    #   env:
-    #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    #       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    #   with:
-    #     args: >
-    #         -Dsonar.projectKey=my-project
-    #         -Dsonar.sources=.
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v6
+      env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      with:
+        args: >
+            -Dsonar.projectKey=finops-project
+            -Dsonar.sources=.
 
-    # - name: SonarQube Quality Gate
-    #   id: quality_checks
-    #   uses: SonarSource/sonarqube-quality-gate-action@v1
-    #   timeout-minutes: 5
-    #   env:
-    #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: SonarQube Quality Gate
+      id: quality_checks
+      uses: SonarSource/sonarqube-quality-gate-action@v1
+      timeout-minutes: 5
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    # - name: Update code quality status
-    #   if: always()
-    #   uses: chakra-E2E/Devops-workflows/.github/actions@main        
-    #   with:
-    #     sha: ${{ github.sha }}
-    #     state: ${{ steps.quality_checks.outcome }}     # PASSED / FAILED
-    #     context: QUALITY_CHECK
-    #     description: ${{ steps.quality_checks.outcome }}
+    - name: Update code quality status
+      if: always()
+      uses: chakra-E2E/Devops-workflows/.github/actions@main        
+      with:
+        sha: ${{ github.sha }}
+        state: ${{ steps.quality_checks.outcome }}     # PASSED / FAILED
+        context: QUALITY_CHECK
+        description: ${{ steps.quality_checks.outcome }}
     
     - name: docker build
       id: docker_build

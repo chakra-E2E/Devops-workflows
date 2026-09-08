@@ -74,7 +74,7 @@ jobs:
     - name: docker build
       id: docker_build
       run: |
-        docker build -t ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion
+        docker build -t ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion .
 
     - name: Update docker build status
       if: always()
