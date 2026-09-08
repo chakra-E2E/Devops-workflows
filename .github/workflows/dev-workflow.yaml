@@ -52,7 +52,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       with:
         args: >
-            -Dsonar.projectKey=my-project
+            -Dsonar.projectKey=finops-dev-project
             -Dsonar.sources=.
 
     - name: SonarQube Quality Gate
@@ -129,6 +129,11 @@ jobs:
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.us-east-1.amazonaws.com
         docker push ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion
 
+    - name: authenticate to EKS
+      run: |
+          aws eks update-kubeconfig --region us-east-1 --name roboshop-${{ inputs.environment }}
+          kubectl get nodes
+          
     - name: checkout catalogue deploy repo
       uses: actions/checkout@v7
       with:
