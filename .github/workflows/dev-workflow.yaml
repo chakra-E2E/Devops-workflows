@@ -15,7 +15,9 @@ on:
       subscription:
         type: string
         required: true
-
+      environment:
+        type: string
+        required: false
 jobs:
   nodejs:
     runs-on: nodejs-agent
@@ -133,7 +135,7 @@ jobs:
       run: |
           aws eks update-kubeconfig --region us-east-1 --name roboshop-${{ inputs.environment }}
           kubectl get nodes
-          
+
     - name: checkout catalogue deploy repo
       uses: actions/checkout@v7
       with:

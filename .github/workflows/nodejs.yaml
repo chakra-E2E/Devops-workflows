@@ -15,7 +15,9 @@ on:
       subscription:
         type: string
         required: true
-
+      environment:
+        type: string
+        required: false
 jobs:
   nodejs:
     runs-on: nodejs-agent
