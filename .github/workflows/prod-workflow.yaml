@@ -10,7 +10,7 @@ on:
         type: string
 jobs:
   non-prod:
-    runs-on: nodejs
+    runs-on: nodejs-agent
     steps: 
     - name: compute commit
       id: commit
@@ -73,13 +73,13 @@ jobs:
           kubectl get nodes
 
     - name: checkout catalogue deploy repo
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
-          repository: nihu-ci/catalogue-deploy
+          repository: chakra-E2E/finops-deploy
 
     - name: deploy to ${{ inputs.environment }} cluster
       id: prod_deploy
-      run: "helm upgrade --install catalogue -f values-dev.yaml -n roboshop --set deployment.imageVersion=$appVersion --atomic --wait --timeout=5m ."
+      run: "helm upgrade --install finops -f values-dev.yaml -n finops --set deployment.imageVersion=$appVersion --atomic --wait --timeout=5m ."
 
     - name: Update Deploy status
       if: always()

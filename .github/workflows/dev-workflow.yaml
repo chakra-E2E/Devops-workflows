@@ -129,7 +129,12 @@ jobs:
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.us-east-1.amazonaws.com
         docker push ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion
 
-    - name: deploy to DEV cluster
+    - name: checkout catalogue deploy repo
+      uses: actions/checkout@v7
+      with:
+          repository: chakra-E2E/finops-deploy
+          
+    - name: deploy to ${{ inputs.environment }} cluster
       id: dev_deploy
       run:
         "helm upgrade --install ${{ inputs.component}} -f values-${{ inputs.environment }}.yaml -n ${{ inputs.project }} --set deployment.imageVersion=$appVersion --atomic --wait --timeout=5m ."

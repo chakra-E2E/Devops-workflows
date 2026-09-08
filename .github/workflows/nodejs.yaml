@@ -20,7 +20,7 @@ jobs:
   nodejs:
     runs-on: nodejs-agent
     env:
-      acc_id: ${{ github.event.inputs.subscription }}
+      acc_id: ${{ inputs.subscription }}
     steps:
     - name: Get code
       uses: actions/checkout@v7
@@ -38,7 +38,7 @@ jobs:
 
     - name: update status of unit test
       if: always()
-      uses: chakra-E2E/Devops-workflows/.github/actions@main
+      uses: Devops-workflows/.github/actions@main
       with:
         sha: ${{ github.sha }}
         context: UNIT_TEST
@@ -62,7 +62,7 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: Update cod quality status
+    - name: Update code quality status
       if: always()
       uses: chakra-E2E/Devops-workflows/.github/actions@main        
       with:
