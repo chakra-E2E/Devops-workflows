@@ -1,0 +1,130 @@
+name: nodejs workflow
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        type: string
+        required: true
+      component:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+        default: ""
+      subscription:
+        type: string
+        required: true
+
+jobs:
+  nodejs:
+    runs-on: nodejs-agent
+    env:
+      acc_id: ${{ github.event.inputs.subscription }}
+    steps:
+    - name: Get code
+      uses: actions/checkout@v7
+    
+    - name: Get version
+      run: |
+        echo "appVersion=${GITHUB_SHA::9}" >> $GITHUB_ENV
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Run unit tests
+      id: unit_tests
+      run: npm test
+
+    - name: update status of unit test
+      if: always()
+      uses: chakra-E2E/Devops-workflows/.github/actions@main
+      with:
+        sha: ${{ github.sha }}
+        context: UNIT_TEST
+        state: ${{ steps.unit_tests.outcome }}
+        description: ${{ steps.unit_tests.outcome }}
+
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v6
+      env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      with:
+        args: >
+            -Dsonar.projectKey=my-project
+            -Dsonar.sources=.
+
+    - name: SonarQube Quality Gate
+      id: quality_checks
+      uses: SonarSource/sonarqube-quality-gate-action@v1
+      timeout-minutes: 5
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Update cod quality status
+      if: always()
+      uses: chakra-E2E/Devops-workflows/.github/actions@main        
+      with:
+        sha: ${{ github.sha }}
+        state: ${{ steps.quality_checks.outcome }}     # PASSED / FAILED
+        context: QUALITY_CHECK
+        description: ${{ steps.quality_checks.outcome }}
+    
+    - name: docker build
+      id: docker_build
+      run: |
+        docker build -t ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion
+
+    - name: Update docker build status
+      if: always()
+      uses: chakra-E2E/Devops-workflows/.github/actions@main    
+      with:
+        sha: ${{ github.sha }}
+        state: ${{ steps.docker_build.outcome }}     # success / failure / cancelled
+        context: DOCKER_BUILD
+        description: ${{ steps.docker_build.outcome }}
+
+    - name: Security Check (Trivy)
+      id: security_check
+      # env:
+      #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      shell: bash
+      run: |
+        echo "🔍 Running Trivy scan..."
+        trivy image \
+          --scanners vuln \
+          --severity HIGH,CRITICAL,MEDIUM \
+          --pkg-types os \
+          --exit-code 0 \
+          --format table \
+          ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion
+        TRIVY_RESULT=$?
+
+        if [ "$TRIVY_RESULT" -ne 0 ]; then
+          echo "❌ Trivy found vulnerabilities (HIGH/CRITICAL/MEDIUM)"
+          exit 1
+        fi
+
+        echo "✅ Trivy scan passed without blocking issues."
+
+    - name: Update scan status
+      if: always()  # Even if previous step fails, this should run.
+      uses: chakra-E2E/Devops-workflows/.github/actions@main
+      with:
+        context: SCANS
+        sha: ${{ github.sha }}
+        description: ${{ steps.security_check.outcome }}
+        state: ${{ steps.security_check.outcome }}      
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: push image
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.us-east-1.amazonaws.com
+        docker push ${acc_id}.dkr.ecr.us-east-1.amazonaws.com/${{ inputs.project }}/${{ inputs.component }}:$appVersion
