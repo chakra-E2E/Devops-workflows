@@ -1,6 +1,6 @@
 name: nodejs workflow
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       project:
         type: string
