@@ -38,7 +38,7 @@ jobs:
 
     - name: update status of unit test
       if: always()
-      uses: Devops-workflows/.github/actions@main
+      uses: chakra-E2E/Devops-workflows/.github/actions@main
       with:
         sha: ${{ github.sha }}
         context: UNIT_TEST
