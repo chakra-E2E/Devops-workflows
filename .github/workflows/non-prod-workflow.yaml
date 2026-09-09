@@ -26,7 +26,7 @@ jobs:
           echo "🔍 Checking commit statuses for ${{ inputs.version }}"
 
           REQUIRED_CONTEXTS=(
-            "UNIT_TESTS"
+            "UNIT_TEST"
             "QUALITY_CHECK"
             "DOCKER_BUILD"
             "SCANS"
