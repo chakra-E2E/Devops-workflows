@@ -6,7 +6,7 @@ on:
         type: string
         required: true
 jobs:
-  non-prod:
+  prod-deploy:
     runs-on: nodejs-agent
     steps: 
     - name: compute commit
