@@ -51,7 +51,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       with:
         args: >
-            -Dsonar.projectKey=finops-project
+            -Dsonar.projectKey=finops-ci-checks
             -Dsonar.sources=.
 
     - name: SonarQube Quality Gate
