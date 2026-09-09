@@ -5,9 +5,6 @@ on:
       version:
         type: string
         required: true
-      environment:
-        required: true
-        type: string
 jobs:
   non-prod:
     runs-on: nodejs-agent
@@ -69,7 +66,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: authenticate to EKS
       run: |
-          aws eks update-kubeconfig --region us-east-1 --name roboshop-${{ inputs.environment }}
+          aws eks update-kubeconfig --region us-east-1 --name roboshop-prod
           kubectl get nodes
 
     - name: checkout catalogue deploy repo

@@ -22,7 +22,7 @@ jobs:
   nodejs:
     runs-on: nodejs-agent
     env:
-      acc_id: ${{ github.event.inputs.subscription }}
+      acc_id: ${{ inputs.subscription }}
     steps:
     - name: Get code
       uses: actions/checkout@v7
