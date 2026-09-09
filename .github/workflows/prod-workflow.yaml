@@ -69,7 +69,7 @@ jobs:
           aws eks update-kubeconfig --region us-east-1 --name roboshop-prod
           kubectl get nodes
 
-    - name: checkout catalogue deploy repo
+    - name: checkout finops deploy repo
       uses: actions/checkout@v7
       with:
           repository: chakra-E2E/finops-deploy

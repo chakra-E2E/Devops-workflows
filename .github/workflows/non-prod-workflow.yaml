@@ -66,13 +66,13 @@ jobs:
           aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
+
     - name: authenticate to EKS
       run: |
           aws eks update-kubeconfig --region us-east-1 --name roboshop-${{ inputs.environment }}
           kubectl get nodes
 
-    - name: checkout catalogue deploy repo
+    - name: checkout finops deploy repo
       uses: actions/checkout@v6
       with:
           repository: chakra-E2E/finops-deploy
