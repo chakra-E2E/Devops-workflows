@@ -36,7 +36,7 @@ jobs:
     
     - name: Run unit tests
       id: unit_tests
-      run: npm test
+      run: npm run coverage
 
     - name: update status of unit test
       if: always()
