@@ -33,7 +33,7 @@ jobs:
     
     - name: Run unit tests
       id: unit_tests
-      run: npm run coverage
+      run: npm test
 
     - name: update status of unit test
       if: always()
