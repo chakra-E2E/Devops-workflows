@@ -10,7 +10,7 @@ on:
         type: string
 jobs:
   non-prod:
-    runs-on: nodejs
+    runs-on: nodejs-agent
     steps: 
     - name: compute commit
       id: commit
