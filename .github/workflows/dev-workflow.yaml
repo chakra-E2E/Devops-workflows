@@ -144,7 +144,7 @@ jobs:
     - name: deploy to ${{ inputs.environment }} cluster
       id: dev_deploy
       run:
-        "helm upgrade --install ${{ inputs.component}} -f values-${{ inputs.environment }}.yaml -n ${{ inputs.project }} --set deployment.imageVersion=$appVersion --atomic --wait --timeout=5m ."
+        "helm upgrade --install ${{ inputs.component }} -f values-${{ inputs.environment }}.yaml -n ${{ inputs.project }} --set deployment.imageVersion=$appVersion --atomic --wait --timeout=5m ."
 
     - name: Update DEV Deploy status
       if: always()
